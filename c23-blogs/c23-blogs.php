@@ -1,8 +1,8 @@
 <?php
 /**
- * Plugin Name: C23 Blogs - WordPress Default Blogs Replacement
+ * Plugin Name: C23 Blogs
  * Plugin URI: https://github.com/Chiku23/wordpress
- * Description: A modern, powerful replacement for default WordPress posts featuring beautiful responsive card layouts, estimated reading time, author boxes, categorized archives, and unified settings.
+ * Description: A simple modern plugin for WordPress to publish blog posts, it has features like responsive card layouts, estimated reading time, author boxes, categorized archives, and unified settings.
  * Version: 2.0.0
  * Author: Chiku23
  * Text Domain: c23-blogs
