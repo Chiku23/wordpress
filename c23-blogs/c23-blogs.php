@@ -1,75 +1,62 @@
 <?php
- /*
-   Plugin Name: Blogs
-   description: It is a perfect replacement of default posts of wordpress. Install-Setup-Enjoy. 
-   Version: 1.1
-   Author: Chiku23
-   */
-?>
-<?php
-add_action('init', 'c23_blogsposttyperegister');
-add_action( 'admin_enqueue_scripts', 'c23_enqueue_color_picker' );
-add_action( 'wp_enqueue_scripts','register_c23_blogs_frontend_styles');
+/**
+ * Plugin Name: C23 Blogs - WordPress Default Blogs Replacement
+ * Plugin URI: https://github.com/Chiku23/wordpress
+ * Description: A modern, powerful replacement for default WordPress posts featuring beautiful responsive card layouts, estimated reading time, author boxes, categorized archives, and unified settings.
+ * Version: 2.0.0
+ * Author: Chiku23
+ * Text Domain: c23-blogs
+ * Domain Path: /languages
+ *
+ * @package C23_Blogs
+ */
 
-add_filter('archive_template', 'custom_c23_blogs_archive_template');
-add_filter('single_template', 'c23_blogs_single_template');
-add_filter( 'excerpt_length', 'c23_blogs_excerpt_length');
-add_filter( 'excerpt_more', 'c23_blogs_excerpt_more' );
-
-
-require_once('widgets/c23-blogs-list-widget.php');
-require_once ('lib/c23-blog-setting.php');
-require_once ('lib/c23-css-setting.php');
-require_once('lib/c23-cssSettingsOutput.php');
-
-function c23_blogsposttyperegister(){
-    register_post_type( 'c23_blogs',
-        array(
-        'labels' => array(
-            'name' => __( 'Blogs' ),
-            'singular_name' => __( 'Blog' )
-            ),
-        'public' => true,
-        'show_in_rest' => true,
-        'supports' => array('title', 'editor', 'thumbnail', 'excerpt'),
-        'has_archive' => true,
-        'rewrite'   => array( 'slug' => 'blogs' ),
-        'menu_position' => 10,
-        'menu_icon' => 'dashicons-welcome-write-blog',
-        )
-    );
-
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
 }
 
-function custom_c23_blogs_archive_template($tpl){
-    global $post;
-    if(is_post_type_archive('c23_blogs')){
-        $tpl = plugin_dir_path(__FILE__).'/archive-c23_blogs.php';
-    }
-    return $tpl;
-}
-function c23_blogs_single_template($singleTemplate){
-    global $post;
-    if (is_single() && $post->post_type=='c23_blogs'){
-        $singleTemplate = plugin_dir_path(__FILE__).'/templates/single-c23_blogs.php';
-    }
-    return $singleTemplate;
+// Define Plugin Constants
+define( 'C23_BLOGS_VERSION', '2.0.0' );
+define( 'C23_BLOGS_FILE', __FILE__ );
+define( 'C23_BLOGS_PATH', plugin_dir_path( __FILE__ ) );
+define( 'C23_BLOGS_URL', plugin_dir_url( __FILE__ ) );
+
+// Load Core Plugin Class
+require_once C23_BLOGS_PATH . 'includes/class-c23-blogs.php';
+
+// Register Activation & Deactivation Hooks
+register_activation_hook( __FILE__, array( 'C23_Blogs', 'activate' ) );
+register_deactivation_hook( __FILE__, array( 'C23_Blogs', 'deactivate' ) );
+
+/**
+ * Return the main C23_Blogs instance.
+ *
+ * @return C23_Blogs
+ */
+function c23_blogs() {
+	return C23_Blogs::instance();
 }
 
-function register_c23_blogs_frontend_styles(){
-    wp_enqueue_style('fronendCSScustom',plugin_dir_url(__FILE__).'assets/front-end.css');
-    wp_enqueue_style('bootstrapfrontend',plugin_dir_url(__FILE__).'assets/bootstrap.min.css');
+// Bootstrap plugin
+c23_blogs();
+
+// =========================================================================
+// Backward Compatibility Layer for Legacy Functions
+// =========================================================================
+if ( ! function_exists( 'c23_blogsposttyperegister' ) ) {
+	function c23_blogsposttyperegister() {
+		// Handled by C23_Blogs_Post_Type
+	}
 }
 
-function c23_enqueue_color_picker( $hook_suffix ) {
-// first check that $hook_suffix is appropriate for your admin page
-wp_enqueue_style( 'wp-color-picker' );
-wp_enqueue_script( 'my-script-handle', plugins_url('assets/js/color-script.js', __FILE__ ), array( 'wp-color-picker' ), false, true );
+if ( ! function_exists( 'c23_blogs_excerpt_length' ) ) {
+	function c23_blogs_excerpt_length( $length ) {
+		return C23_Blogs_Post_Type::filter_excerpt_length( $length );
+	}
 }
 
-function c23_blogs_excerpt_length($length){
-    return 40;
-}
-function c23_blogs_excerpt_more( $more ) {
-    return '. . . . . . ';
+if ( ! function_exists( 'c23_blogs_excerpt_more' ) ) {
+	function c23_blogs_excerpt_more( $more ) {
+		return C23_Blogs_Post_Type::filter_excerpt_more( $more );
+	}
 }
